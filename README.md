@@ -1,5 +1,5 @@
-arbitrary++
-===========
+arbitrary
+=========
 
 This is a header library for providiing a quick and easy API for generating
 testing data. It's heavily influenced from the ideas introduced by the Arbitrary
@@ -23,6 +23,12 @@ To make your custom types to be generatable simply write a
 template-specification for the arbitrary::Arbitrary struct. Here's an example: 
 
 ```c++
+#include "arbitrary/arbitrary"
+
+//if you plan on using arbitrary::choose() for integral or floating types then
+//make sure you include this line in your main.
+INIT_ARBITRARY()
+
 //we define a sample class
 struct ExampleClass
 {
