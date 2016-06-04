@@ -28,6 +28,32 @@
 namespace arbitrary
 {
 
+/** Our general exception class
+ *
+ *
+ *
+ */
+class ArbitraryException : public std::exception
+{
+  public:
+    ArbitraryException()
+      : message("Empty Exception") {};
+
+    ArbitraryException(std::string msg)
+      : message(msg)
+    {};
+
+    virtual ~ArbitraryException() {};
+
+    virtual const char* what()
+    {
+      return this->message.c_str();
+    }
+
+  private:
+    std::string message;
+};
+
 /** Default struct for the number generator.
  *
  * Users should ignore this.
@@ -143,6 +169,29 @@ std::vector<A> vectorOf()
     data.push_back(arbitrary<A>());
 }
 
+/** Generates A such that the given predicate holds true
+ *
+ * @pred - the predicate with type-signature: `bool (A&)`
+ *
+ * This function will throw an exception after N retries and no suitable data is
+ * generated.
+ *
+ */
+template<typename A, typename Pred>
+A suchThat(Pred&& pred, size_t N = 100)
+{
+  A data = arbitrary<A>();
+  size_t n = N;
+
+  while(!pred(data) && n--)
+    data = arbitrary<A>();
+
+  if(!n && !pred(data))
+    throw ArbitraryException("Couldn't generate A in suchThat");
+
+  return data;
+}
+
 template<typename A>
 struct Arbitrary<A*>
 {
@@ -201,12 +250,14 @@ struct Arbitrary<std::basic_string<CharT,Traits,Allocator>>
     //32 - 126 is the visible character range on the ACSII table (includes
     //space character).
     for(SizeType i = 0; i < strSize; i++)
-      str.push_back(TraitsType::to_char_type(choose<typename TraitsType::int_type>(32,126)));
+      str.push_back(TraitsType::to_char_type(choose<typename TraitsType::int_type>(32,
+                                             126)));
 
     return str;
   }
 };
 
 } /* Arbitrary */
+
 
 #endif
