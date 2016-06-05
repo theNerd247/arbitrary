@@ -12,6 +12,8 @@ project("arbitrary-test")
 
 include(ARCB)
 
+add_definitions("-g")
+
 find_package(GTest REQUIRED)
 
 # should be "toplevel","executable","staticlib",or "sharedlib"
